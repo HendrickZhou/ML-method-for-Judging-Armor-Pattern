@@ -17,36 +17,36 @@ using namespace cv::ml;
 			--neg
 */
 
+
+void getFiles(string filePath, vector<string> fileName)
+{
+
+}
+
 /*
 *	dataType: true for the pos, false for the neg
+*	the samples are one-channel grayscale imgs and finally convert to CV32F1
 */
-void readFile(string filePath, Mat & dataSet, Mat & label, bool dataType, int maxFilePreIndex)
+void readFile(string filePath, Mat & dataSet, vector<int> & label, bool dataType, int maxFilePreIndex)
 {
-	vector<int> temp_label;
-	vector<Mat> temp_data;
+
 	for (int j = 1; j <= maxFilePreIndex; j++)
 	{
-		for (int i = 0; ; i++)
+		for (int i = 0; i< 5; i++)
 		{
 			// safely read the img
 			string fileName = to_string(j) + "_" + to_string(i) + ".jpg";
-			Mat src = imread(filePath + fileName);
-			if (src.empty()) break;
+			Mat src = imread(filePath + fileName, IMREAD_GRAYSCALE);
+			if (src.empty()) continue;
 			if (src.size().width > 50)
 				continue;
 
 			//push the label and data 
-			temp_data.emplace_back(src.reshape(1, 1));
-			Mat(temp_data).copyTo(dataSet);
-			
-			if (dataType) temp_label.emplace_back(1);
-			else temp_label.emplace_back(0);
-			Mat(temp_label).copyTo(label);
+			//temp_data.push_back(src.reshape(1, 1));
+			dataSet.push_back(src.reshape(1, 1));
 
-			// regulate the format
-			dataSet.convertTo(dataSet, CV_32FC1);
-			label.convertTo(label, CV_32SC1);
-			
+			if (dataType) label.emplace_back(1);
+			else label.emplace_back(0);
 		}
 	}
 }
@@ -65,22 +65,89 @@ int main()
 	string filePathTestPos = "data_svm/test/pos/";
 	string filePathTestNeg = "data_svm/test/neg/";
 
-	Mat train_pos_data, train_neg_data, test_pos_data, test_neg_data;
+	//Mat train_pos_data, train_neg_data, test_pos_data, test_neg_data;
+	Mat train_data, test_data;
 	Mat train_label, test_label;
+	vector<int> train_label_vec, test_label_vec;
 
 	//read the train data & regulate the format
-	readFile(filePath + filePathTrainPos, train_pos_data, train_label, true, 800);
-	readFile(filePath + filePathTrainNeg, train_neg_data, train_label, false, 300);
+	readFile(filePath + filePathTrainPos, train_data, train_label_vec, true, 800);
+	readFile(filePath + filePathTrainNeg, train_data, train_label_vec, false, 300);
+	Mat(train_label_vec).copyTo(train_label);
+	train_data.convertTo(train_data, CV_32FC1);
+	train_label.convertTo(train_label, CV_32SC1);
+	transpose(train_label, train_label);
 
-	//read the test data & regulate the format
-	readFile(filePath + filePathTestPos, test_pos_data, test_label, true, 800);
-	readFile(filePath + filePathTestNeg, test_neg_data, test_label, false, 300);
-
-	
+	////read the test data & regulate the format
+	//readFile(filePath + filePathTestPos, test_data, test_label_vec, true, 800);
+	//readFile(filePath + filePathTestNeg, test_data, test_label_vec, false, 300);
+	//Mat(test_label_vec).copyTo(test_data);
+	//test_data.convertTo(test_data, CV_32FC1);
+	//test_label.convertTo(test_label, CV_32SC1);
 
 	/*
 	*	2. Configure the SVM param
 	*/
-	
+	Ptr<SVM> svm = SVM::create();
+	svm->setType(SVM::C_SVC);
+	svm->setKernel(SVM::LINEAR);
+	svm->setTermCriteria(TermCriteria(CV_TERMCRIT_ITER, 100, 1e-6));
+
+	/*
+	*	3. Train the SVM
+	*/
+	svm->train(train_data, SampleTypes::ROW_SAMPLE, train_label);
+
+	/*
+	*	4. Save the model
+	*/
+	svm->save("C:/Users/cooper/Desktop/Resp_for_ML/ML-method-for-Judging-Armor-Pattern/SVM.xml");
+
+
 
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+//vector<int> temp_label;
+//Mat temp_data;
+//
+//vector<string> files;
+//getFiles(filePath, files);
+//int data_size = files.size();
+//
+//if (data_size == 0)
+//{
+//	cout << "Error: empty directory" << endl;
+//}
+//
+//for (int i = 0; i < data_size; i++)
+//{
+//	// safely read the file
+//	cout << files[i].c_str() << endl;
+//	Mat src = imread(files[i].c_str);
+//	if (src.size().width > 50) continue;
+//
+//	//push the label and data 
+//	temp_data.push_back(src.reshape(1, 1));
+//	temp_data.copyTo(dataSet);
+//
+//	if (dataType) temp_label.emplace_back(1);
+//	else temp_label.emplace_back(0);
+//	Mat(temp_label).copyTo(label);
+//
+//	// regulate the format
+//	dataSet.convertTo(dataSet, CV_32FC1);
+//	label.convertTo(label, CV_32SC1);
+//}
