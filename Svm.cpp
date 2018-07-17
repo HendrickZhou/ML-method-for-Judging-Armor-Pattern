@@ -55,7 +55,7 @@ void readPosFile(string filePath, Mat & dataSet, vector<int> & label)
 {
 	for (int i = 1; i <= 5; i++)
 	{
-		for (int j = 1; j <= 500; j++)
+		for (int j = 1; j <= 1500; j++)
 		{
 			// safely read the img
 			string fileName = to_string(i) + "_" + to_string(j) +".jpg";
@@ -112,7 +112,9 @@ int main()
 	//readFile(filePath + filePathTrainPos, train_data, train_label_vec, true, 800);
 	//readFile(filePath + filePathTrainNeg, train_data, train_label_vec, false, 300);
 	readPosFile(filePath + filePathTrainPos, train_data, train_label_vec);
+	int poSize = train_label_vec.size();
 	readNegFile(filePath + filePathTrainNeg, train_data, train_label_vec, 6034);
+	int neSize = train_label_vec.size() - poSize;
 	Mat(train_label_vec).copyTo(train_label);
 	train_data.convertTo(train_data, CV_32FC1);
 	train_label.convertTo(train_label, CV_32SC1);
@@ -126,6 +128,8 @@ int main()
 	//test_label.convertTo(test_label, CV_32SC1);
 
 	cout << "Data prepare successfully" << endl;
+	cout << "positive samples :" << poSize <<endl;
+	cout << "negtive samples :" << neSize << endl;
 
 	/*
 	*	2. Configure the SVM param
@@ -148,11 +152,11 @@ int main()
 	*	4. Save the model
 	*/
 	//svm->save("C:/Users/cooper/Desktop/Resp_for_ML/ML-method-for-Judging-Armor-Pattern/SVM.xml");
-	svm->save("C:/Users/cooper/Desktop/Resp_for_ML/ML-method-for-Judging-Armor-Pattern/SVM2.xml");
+	svm->save("C:/Users/cooper/Desktop/Resp_for_ML/ML-method-for-Judging-Armor-Pattern/SVM3.xml");
 
 	cout << "model saved" << endl;
 
-
+	system("pause");
 }
 
 
