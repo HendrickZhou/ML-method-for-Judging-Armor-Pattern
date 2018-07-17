@@ -27,30 +27,68 @@ void getFiles(string filePath, vector<string> fileName)
 *	dataType: true for the pos, false for the neg
 *	the samples are one-channel grayscale imgs and finally convert to CV32F1
 */
-void readFile(string filePath, Mat & dataSet, vector<int> & label, bool dataType, int maxFilePreIndex)
-{
+//void readFile(string filePath, Mat & dataSet, vector<int> & label, bool dataType, int maxFilePreIndex)
+//{
+//
+//	for (int j = 1; j <= maxFilePreIndex; j++)
+//	{
+//		for (int i = 0; i< 5; i++)
+//		{
+//			// safely read the img
+//			string fileName = to_string(j) + "_" + to_string(i) + ".jpg";
+//			Mat src = imread(filePath + fileName, IMREAD_GRAYSCALE);
+//			if (src.empty()) continue;
+//			if (src.size().width > 50)
+//				continue;
+//
+//			//push the label and data 
+//			//temp_data.push_back(src.reshape(1, 1));
+//			dataSet.push_back(src.reshape(1, 1));
+//
+//			if (dataType) label.emplace_back(1);
+//			else label.emplace_back(0);
+//		}
+//	}
+//}
 
-	for (int j = 1; j <= maxFilePreIndex; j++)
+void readPosFile(string filePath, Mat & dataSet, vector<int> & label)
+{
+	for (int i = 1; i <= 5; i++)
 	{
-		for (int i = 0; i< 5; i++)
+		for (int j = 1; j <= 500; j++)
 		{
 			// safely read the img
-			string fileName = to_string(j) + "_" + to_string(i) + ".jpg";
+			string fileName = to_string(i) + "_" + to_string(j) +".jpg";
 			Mat src = imread(filePath + fileName, IMREAD_GRAYSCALE);
 			if (src.empty()) continue;
-			if (src.size().width > 50)
-				continue;
 
 			//push the label and data 
 			//temp_data.push_back(src.reshape(1, 1));
 			dataSet.push_back(src.reshape(1, 1));
 
-			if (dataType) label.emplace_back(1);
-			else label.emplace_back(0);
+			label.emplace_back(1);
 		}
 	}
+
 }
 
+void readNegFile(string filePath, Mat & dataSet, vector<int> & label, int Num)
+{
+	for (int i = 1; i <= Num; i++)
+	{
+		// safely read the img
+		string fileName = to_string(i) + ".jpg";
+		Mat src = imread(filePath + fileName, IMREAD_GRAYSCALE);
+		if (src.empty()) continue;
+
+		//push the label and data 
+		//temp_data.push_back(src.reshape(1, 1));
+		dataSet.push_back(src.reshape(1, 1));
+
+		label.emplace_back(0);
+	}
+
+}
 
 int main()
 {
@@ -71,8 +109,10 @@ int main()
 	vector<int> train_label_vec, test_label_vec;
 
 	//read the train data & regulate the format
-	readFile(filePath + filePathTrainPos, train_data, train_label_vec, true, 800);
-	readFile(filePath + filePathTrainNeg, train_data, train_label_vec, false, 300);
+	//readFile(filePath + filePathTrainPos, train_data, train_label_vec, true, 800);
+	//readFile(filePath + filePathTrainNeg, train_data, train_label_vec, false, 300);
+	readPosFile(filePath + filePathTrainPos, train_data, train_label_vec);
+	readNegFile(filePath + filePathTrainNeg, train_data, train_label_vec, 6034);
 	Mat(train_label_vec).copyTo(train_label);
 	train_data.convertTo(train_data, CV_32FC1);
 	train_label.convertTo(train_label, CV_32SC1);
@@ -85,6 +125,8 @@ int main()
 	//test_data.convertTo(test_data, CV_32FC1);
 	//test_label.convertTo(test_label, CV_32SC1);
 
+	cout << "Data prepare successfully" << endl;
+
 	/*
 	*	2. Configure the SVM param
 	*/
@@ -93,16 +135,22 @@ int main()
 	svm->setKernel(SVM::LINEAR);
 	svm->setTermCriteria(TermCriteria(CV_TERMCRIT_ITER, 100, 1e-6));
 
+	cout << "SVM Param config successfully" << endl;
+
 	/*
 	*	3. Train the SVM
 	*/
+	cout << "start to train the model" << endl;
 	svm->train(train_data, SampleTypes::ROW_SAMPLE, train_label);
+	cout << "model training finished" << endl;
 
 	/*
 	*	4. Save the model
 	*/
-	svm->save("C:/Users/cooper/Desktop/Resp_for_ML/ML-method-for-Judging-Armor-Pattern/SVM.xml");
+	//svm->save("C:/Users/cooper/Desktop/Resp_for_ML/ML-method-for-Judging-Armor-Pattern/SVM.xml");
+	svm->save("C:/Users/cooper/Desktop/Resp_for_ML/ML-method-for-Judging-Armor-Pattern/SVM2.xml");
 
+	cout << "model saved" << endl;
 
 
 }
