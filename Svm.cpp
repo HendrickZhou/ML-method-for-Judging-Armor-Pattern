@@ -136,7 +136,7 @@ int main()
 	*/
 	Ptr<SVM> svm = SVM::create();
 	svm->setType(SVM::C_SVC);
-	svm->setKernel(SVM::LINEAR);
+	svm->setKernel(SVM::RBF);
 	svm->setTermCriteria(TermCriteria(CV_TERMCRIT_ITER, 100, 1e-6));
 
 	cout << "SVM Param config successfully" << endl;
@@ -152,7 +152,7 @@ int main()
 	*	4. Save the model
 	*/
 	//svm->save("C:/Users/cooper/Desktop/Resp_for_ML/ML-method-for-Judging-Armor-Pattern/SVM.xml");
-	svm->save("C:/Users/cooper/Desktop/Resp_for_ML/ML-method-for-Judging-Armor-Pattern/SVM3.xml");
+	svm->save("C:/Users/cooper/Desktop/Resp_for_ML/ML-method-for-Judging-Armor-Pattern/SVM3_RBF.xml");
 
 	cout << "model saved" << endl;
 

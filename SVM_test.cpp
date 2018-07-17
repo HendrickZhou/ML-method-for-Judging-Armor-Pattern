@@ -26,7 +26,7 @@ int main()
 			Mat data = src.reshape(1, 1);
 			data.convertTo(data, CV_32FC1);
 
-			Ptr<SVM> svm = StatModel::load<SVM>("C:/Users/cooper/Desktop/Resp_for_ML/ML-method-for-Judging-Armor-Pattern/SVM2.xml");
+			Ptr<SVM> svm = StatModel::load<SVM>("C:/Users/cooper/Desktop/Resp_for_ML/ML-method-for-Judging-Armor-Pattern/SVM3_RBF.xml");
 			int result = (int)svm->predict(data);
 			if (result == 1)
 			{
@@ -34,15 +34,15 @@ int main()
 			}
 			else
 			{
-				cout << "Not a Armor!" << endl;
+				cout << "Not!" << endl;
 			}
 
 			imshow("src", src);
 			waitKey(0);
 
 			auto t2 = chrono::high_resolution_clock::now();
-			cout << "Total period: " << (static_cast<chrono::duration<double, std::milli>>(t2 - t1)).count() << " ms" << endl;
-			cout << endl;
+			//cout << "Total period: " << (static_cast<chrono::duration<double, std::milli>>(t2 - t1)).count() << " ms" << endl;
+			//cout << endl;
 		}
 	}
 
